@@ -9,7 +9,7 @@
 
 <body>
     <h1>Carbon Offset Survey</h1>
-    <form id="carbonForm" action="https://hook.eu2.make.com/t3b7gu3hpcttffgeg8bsnc9navyr8p6n" method="POST">
+    <form id="carbonForm" action="https://hook.eu2.make.com/lx4g7emrs7e4pw41i4lmpbh2qnnsoqqi" method="POST">
         <label for="question1">Car Type (small, medium, large):</label><br>
         <input type="text" id="question1" name="car_type"><br><br>
 
@@ -47,7 +47,7 @@
 
             const formData = new FormData(document.getElementById('carbonForm'));
 
-            fetch('https://hook.integromat.com/YOUR_MAKE_WEBHOOK_URL', {
+            fetch('https://hook.eu2.make.com/lx4g7emrs7e4pw41i4lmpbh2qnnsoqqi', {
                 method: 'POST',
                 body: formData
             })
