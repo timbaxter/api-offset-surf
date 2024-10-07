@@ -8,45 +8,55 @@
 </head>
 
 <body>
-    <h1>Carbon Offset Survey</h1>
-    <form id="carbonForm" action="https://hook.eu2.make.com/lx4g7emrs7e4pw41i4lmpbh2qnnsoqqi" method="POST">
-        <label for="question1">Car Type (small, medium, large):</label><br>
-        <input type="text" id="question1" name="car_type"><br><br>
+    <h2>Carbon Offset Survey</h2>
 
-        <label for="question2">Trip Distance (km):</label><br>
-        <input type="number" id="question2" name="trip_distance"><br><br>
+    <form id="carbonOffsetForm">
+        <label for="recipient_name">Your Name:</label>
+        <input type="text" id="recipient_name" name="recipient_name" required><br><br>
 
-        <input type="submit" value="Calculate Emissions">
+        <label for="recipient_email">Your Email:</label>
+        <input type="email" id="recipient_email" name="recipient_email" required><br><br>
+
+        <label for="car_distance">Distance Driven (in kilometers):</label>
+        <input type="number" id="car_distance" name="car_distance" required><br><br>
+
+        <button type="submit">Calculate Emissions</button>
     </form>
 
-    <div id="result">
-        <!-- The response data will be shown here -->
-    </div>
+    <div id="result"></div>
 
     <script>
-        document.getElementById('carbonForm').onsubmit = function (event) {
+        document.getElementById('carbonOffsetForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
-            const formData = new FormData(document.getElementById('carbonForm'));
+            // Collecting the input values from the form
+            const recipientName = document.getElementById('recipient_name').value;
+            const recipientEmail = document.getElementById('recipient_email').value;
+            const carDistance = document.getElementById('car_distance').value;
 
-            fetch('https://hook.eu2.make.com/lx4g7emrs7e4pw41i4lmpbh2qnnsoqqi', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // Handle the response here
-                    console.log('Emissions calculated:', data);
-                    document.getElementById('result').innerHTML = `
-                    <p>Carbon Emissions: ${data.kgCO2e} kg</p>
-                    <p>Estimated Cost: ${data.cost}</p>
-                `;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('result').innerHTML = `<p>Error calculating emissions.</p>`;
-                });
-        };
+            // This is the structure you will send to Make.com
+            const payload = {
+                "calculation_options": [
+                    {
+                        "type": "travel-land",
+                        "activity": "cars_by_market_segment",
+                        "specification": "average",
+                        "detail": "average",
+                        "value": parseFloat(carDistance),  // User input for distance
+                        "unit": "kilometers"
+                    }
+                ],
+                "recipient_name": recipientName,
+                "recipient_email": recipientEmail
+            };
+
+            // Simulate sending data to Make.com (you would use the real URL for Make.com Webhook)
+            // Here we would use fetch or another method to submit this data to Make.com
+            console.log('Payload to send:', JSON.stringify(payload));
+
+            // Display the result (in a real app, this would be based on API response)
+            document.getElementById('result').innerHTML = "Submitted! Please check your email for carbon offset details.";
+        });
     </script>
 </body>
 
