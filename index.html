@@ -37,6 +37,10 @@
         <input type="submit" value="Calculate Emissions">
     </form>
 
+    <div id="result">
+        <!-- The response data will be shown here -->
+    </div>
+
     <script>
         document.getElementById('carbonForm').onsubmit = function (event) {
             event.preventDefault();
@@ -49,12 +53,16 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    // Handle the response here (e.g., display the result on the page)
+                    // Handle the response here
                     console.log('Emissions calculated:', data);
-                    alert(`Carbon Emissions: ${data.kgCO2e} kg, Cost: ${data.cost}`);
+                    document.getElementById('result').innerHTML = `
+                    <p>Carbon Emissions: ${data.kgCO2e} kg</p>
+                    <p>Estimated Cost: ${data.cost}</p>
+                `;
                 })
                 .catch(error => {
                     console.error('Error:', error);
+                    document.getElementById('result').innerHTML = `<p>Error calculating emissions.</p>`;
                 });
         };
     </script>
