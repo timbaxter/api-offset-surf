@@ -4,17 +4,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Emissions Survey</title>
+    <title>Carbon Offset Survey</title>
 </head>
 
 <body>
-    <h1>Car Emissions Survey</h1>
+    <h1>Carbon Offset Survey</h1>
+    <form id="carbonForm" action="https://hook.integromat.com/YOUR_MAKE_WEBHOOK_URL" method="POST">
+        <label for="question1">Car Type (small, medium, large):</label><br>
+        <input type="text" id="question1" name="car_type"><br><br>
 
-    <form id="emissionsForm" action="https://hook.eu2.make.com/sxju7at5b0f5onjdcdjnio3qt1hpyfra" method="POST">
-        <label for="distance">Enter the distance you drove (in kilometers):</label><br><br>
-        <input type="number" id="distance" name="distance" required><br><br>
-        <input type="submit" value="Submit">
+        <label for="question2">Trip Distance (km):</label><br>
+        <input type="number" id="question2" name="trip_distance"><br><br>
+
+        <label for="question3">Hotel Nights Stayed:</label><br>
+        <input type="number" id="question3" name="hotel_nights"><br><br>
+
+        <label for="question4">Flight Departure City:</label><br>
+        <input type="text" id="question4" name="departure_city"><br><br>
+
+        <label for="question5">Flight Destination City:</label><br>
+        <input type="text" id="question5" name="destination_city"><br><br>
+
+        <label for="question6">Type of Accommodation (hotel, apartment, etc.):</label><br>
+        <input type="text" id="question6" name="accommodation_type"><br><br>
+
+        <label for="question7">Number of People Traveling:</label><br>
+        <input type="number" id="question7" name="num_people"><br><br>
+
+        <label for="question8">Transport Mode (car, bus, train):</label><br>
+        <input type="text" id="question8" name="transport_mode"><br><br>
+
+        <input type="submit" value="Calculate Emissions">
     </form>
+
+    <script>
+        document.getElementById('carbonForm').onsubmit = function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(document.getElementById('carbonForm'));
+
+            fetch('https://hook.integromat.com/YOUR_MAKE_WEBHOOK_URL', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response here (e.g., display the result on the page)
+                    console.log('Emissions calculated:', data);
+                    alert(`Carbon Emissions: ${data.kgCO2e} kg, Cost: ${data.cost}`);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        };
+    </script>
 </body>
 
 </html>
