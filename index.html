@@ -64,13 +64,23 @@
                 method: 'POST',
                 body: formData
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json(); // Ensure the response is in JSON format
+                })
                 .then(data => {
                     console.log('Emissions calculated:', data);
-                    document.getElementById('result').innerHTML = `
+                    // Check if data contains the expected fields
+                    if (data.kgCO2e && data.cost) {
+                        document.getElementById('result').innerHTML = `
                     <p>Carbon Emissions: ${data.kgCO2e} kg</p>
                     <p>Estimated Cost: ${data.cost}</p>
-                `;
+                    `;
+                    } else {
+                        document.getElementById('result').innerHTML = `<p>Unexpected response format.</p>`;
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -78,6 +88,7 @@
                 });
         };
     </script>
+
 </body>
 
 </html>
