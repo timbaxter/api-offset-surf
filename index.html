@@ -65,25 +65,30 @@
                 body: formData
             })
                 .then(response => {
+                    // Check if the response is OK, otherwise throw an error
                     if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
+                        throw new Error('Network response was not ok: ' + response.statusText);
                     }
-                    return response.json(); // Ensure the response is in JSON format
+                    return response.json(); // Ensure we get the response as JSON
                 })
                 .then(data => {
-                    console.log('Emissions calculated:', data);
-                    // Check if data contains the expected fields
+                    // Log the received data to the console for debugging purposes
+                    console.log('Received response data:', data);
+
+                    // Check if the expected fields are in the response data
                     if (data.kgCO2e && data.cost) {
                         document.getElementById('result').innerHTML = `
                     <p>Carbon Emissions: ${data.kgCO2e} kg</p>
                     <p>Estimated Cost: ${data.cost}</p>
                     `;
                     } else {
+                        // Handle the case where the response does not contain expected data
                         document.getElementById('result').innerHTML = `<p>Unexpected response format.</p>`;
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    // Log the error to the console for debugging purposes
+                    console.error('Error fetching or processing data:', error);
                     document.getElementById('result').innerHTML = `<p>Error calculating emissions.</p>`;
                 });
         };
