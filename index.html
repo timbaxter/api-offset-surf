@@ -66,19 +66,25 @@
             })
                 .then(response => response.text())
                 .then(text => {
-                    console.log('Raw response from server:', text);  // Log the raw response for debugging
                     try {
-                        const data = JSON.parse(text);  // Try parsing the response as JSON
-                        console.log('Parsed JSON data:', data);  // Log the parsed data
+                        const data = JSON.parse(text);
+                        console.log('Parsed JSON data:', data);
 
-                        if (data.kgCO2e && data.cost) {
-                            document.getElementById('result').innerHTML = `
-                <p>Carbon Emissions: ${data.kgCO2e} kg</p>
-                <p>Estimated Cost: ${data.cost}</p>
-                `;
+                        // Check if kgCO2e is present and display it
+                        let resultHTML = '';
+                        if (data.kgCO2e) {
+                            resultHTML += `<p>Carbon Emissions: ${data.kgCO2e} kg</p>`;
                         } else {
-                            document.getElementById('result').innerHTML = `<p>Unexpected response format.</p>`;
+                            resultHTML += `<p>Carbon Emissions data is missing.</p>`;
                         }
+
+                        // Check if cost is present and display it, otherwise ignore
+                        if (data.cost) {
+                            resultHTML += `<p>Estimated Cost: ${data.cost}</p>`;
+                        }
+
+                        // Set the result HTML in the div
+                        document.getElementById('result').innerHTML = resultHTML;
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
                         document.getElementById('result').innerHTML = `<p>Invalid JSON response from server: ${text}</p>`;
@@ -89,6 +95,7 @@
                     document.getElementById('result').innerHTML = `<p>Error calculating emissions.</p>`;
                 });
         };
+
     </script>
 
 </body>
