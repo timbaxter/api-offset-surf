@@ -64,17 +64,13 @@
                 method: 'POST',
                 body: formData
             })
-                .then(response => {
-                    // Try to read the response as text first to see if it's valid JSON
-                    return response.text();
-                })
+                .then(response => response.text())
                 .then(text => {
+                    console.log('Raw response from server:', text);  // Log the raw response for debugging
                     try {
-                        // Attempt to parse the text as JSON
-                        const data = JSON.parse(text);
-                        console.log('Received JSON data:', data);
+                        const data = JSON.parse(text);  // Try parsing the response as JSON
+                        console.log('Parsed JSON data:', data);  // Log the parsed data
 
-                        // Display the data if the expected keys are present
                         if (data.kgCO2e && data.cost) {
                             document.getElementById('result').innerHTML = `
                 <p>Carbon Emissions: ${data.kgCO2e} kg</p>
@@ -84,9 +80,7 @@
                             document.getElementById('result').innerHTML = `<p>Unexpected response format.</p>`;
                         }
                     } catch (error) {
-                        // If the JSON parsing fails, log the error and show the raw response
                         console.error('Error parsing JSON:', error);
-                        console.log('Raw response:', text);
                         document.getElementById('result').innerHTML = `<p>Invalid JSON response from server: ${text}</p>`;
                     }
                 })
