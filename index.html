@@ -50,31 +50,31 @@
         <!-- Number of Wax Blocks Purchased -->
         <label for="waxBlocks">Number of wax blocks purchased in the last year:</label><br>
         <select id="waxBlocks" name="wax_blocks">
-            <!-- Options will be populated by JavaScript -->
+            <!-- Options from 0 to 50 -->
         </select><br><br>
 
         <!-- Number of Wetsuits Purchased -->
         <label for="wetsuits">Number of new wetsuits purchased in the last year:</label><br>
         <select id="wetsuits" name="wetsuits">
-            <!-- Options will be populated by JavaScript -->
+            <!-- Options from 0 to 50 -->
         </select><br><br>
 
         <!-- Number of Mid-Lengths (8ft) Purchased -->
         <label for="midLength">Number of new mid-lengths (8ft) purchased in the last year:</label><br>
         <select id="midLength" name="mid_length">
-            <!-- Options will be populated by JavaScript -->
+            <!-- Options from 0 to 50 -->
         </select><br><br>
 
         <!-- Number of Shortboards (6ft) Purchased -->
         <label for="shortboards">Number of new shortboards (6ft) purchased in the last year:</label><br>
         <select id="shortboards" name="shortboards">
-            <!-- Options will be populated by JavaScript -->
+            <!-- Options from 0 to 50 -->
         </select><br><br>
 
         <!-- Number of Longboards (9ft) Purchased -->
         <label for="longboards">Number of new longboards (9ft) purchased in the last year:</label><br>
         <select id="longboards" name="longboards">
-            <!-- Options will be populated by JavaScript -->
+            <!-- Options from 0 to 50 -->
         </select><br><br>
 
         <input type="submit" value="Calculate Emissions">
@@ -85,39 +85,24 @@
     </div>
 
     <script>
-        // Function to fetch dropdown options from Google Sheets API
-        async function fetchOptions() {
-            try {
-                const response = await fetch('https://sheetdb.io/api/v1/i3frlnwvx2wgs');
-                const data = await response.json();
-
-                // Assuming the API returns data in this format:
-                // [{ "type": "wax_blocks", "values": ["0", "1", "2", ...]}, ...]
-
-                const waxBlocks = data.find(item => item.type === 'wax_blocks');
-                const wetsuits = data.find(item => item.type === 'wetsuits');
-                const midLength = data.find(item => item.type === 'mid_length');
-                const shortboards = data.find(item => item.type === 'shortboards');
-                const longboards = data.find(item => item.type === 'longboards');
-
-                populateDropdown('waxBlocks', waxBlocks.values);
-                populateDropdown('wetsuits', wetsuits.values);
-                populateDropdown('midLength', midLength.values);
-                populateDropdown('shortboards', shortboards.values);
-                populateDropdown('longboards', longboards.values);
-            } catch (error) {
-                console.error('Error fetching options:', error);
-            }
-        }
-
-        // Function to populate a dropdown with options
-        function populateDropdown(dropdownId, options) {
+        // Function to populate a dropdown with numbers from 0 to 50
+        function populateDropdownWithNumbers(dropdownId) {
             const dropdown = document.getElementById(dropdownId);
-            dropdown.innerHTML = options.map(option => `<option value="${option}">${option}</option>`).join('');
+            let options = '';
+            for (let i = 0; i <= 50; i++) {
+                options += `<option value="${i}">${i}</option>`;
+            }
+            dropdown.innerHTML = options;
         }
 
-        // Call the fetchOptions function when the page loads
-        window.onload = fetchOptions;
+        // Call the function to populate each dropdown when the page loads
+        window.onload = function () {
+            populateDropdownWithNumbers('waxBlocks');
+            populateDropdownWithNumbers('wetsuits');
+            populateDropdownWithNumbers('midLength');
+            populateDropdownWithNumbers('shortboards');
+            populateDropdownWithNumbers('longboards');
+        };
 
         // Form submission handler
         document.getElementById('carbonForm').onsubmit = function (event) {
