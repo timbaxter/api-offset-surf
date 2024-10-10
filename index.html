@@ -85,12 +85,47 @@
     </div>
 
     <script>
+        // Function to fetch dropdown options from Google Sheets API
+        async function fetchOptions() {
+            try {
+                const response = await fetch('https://sheetdb.io/api/v1/i3frlnwvx2wgs');
+                const data = await response.json();
+
+                // Assuming the API returns data in this format:
+                // [{ "type": "wax_blocks", "values": ["0", "1", "2", ...]}, ...]
+
+                const waxBlocks = data.find(item => item.type === 'wax_blocks');
+                const wetsuits = data.find(item => item.type === 'wetsuits');
+                const midLength = data.find(item => item.type === 'mid_length');
+                const shortboards = data.find(item => item.type === 'shortboards');
+                const longboards = data.find(item => item.type === 'longboards');
+
+                populateDropdown('waxBlocks', waxBlocks.values);
+                populateDropdown('wetsuits', wetsuits.values);
+                populateDropdown('midLength', midLength.values);
+                populateDropdown('shortboards', shortboards.values);
+                populateDropdown('longboards', longboards.values);
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
+        }
+
+        // Function to populate a dropdown with options
+        function populateDropdown(dropdownId, options) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.innerHTML = options.map(option => `<option value="${option}">${option}</option>`).join('');
+        }
+
+        // Call the fetchOptions function when the page loads
+        window.onload = fetchOptions;
+
+        // Form submission handler
         document.getElementById('carbonForm').onsubmit = function (event) {
             event.preventDefault();
 
             const formData = new FormData(document.getElementById('carbonForm'));
 
-            fetch('https://hook.eu2.make.com/lx4g7emrs7e4pw41i4lmpbh2qnnsoqqi', {
+            fetch('https://hook.eu2.make.com/your_webhook_url', {
                 method: 'POST',
                 body: formData
             })
@@ -98,23 +133,31 @@
                 .then(text => {
                     try {
                         const data = JSON.parse(text);
-                        console.log('Parsed JSON data:', data);
+                        let totalKgCO2e = 0;
 
-                        // Check if kgCO2e is present and display it
-                        let resultHTML = '';
+                        // Combine Klim API data and product emissions
                         if (data.kgCO2e) {
-                            resultHTML += `<p>Carbon Emissions: ${data.kgCO2e} kg</p>`;
-                        } else {
-                            resultHTML += `<p>Carbon Emissions data is missing.</p>`;
+                            totalKgCO2e += parseFloat(data.kgCO2e); // Klim API emissions
+                        }
+                        if (data.wax_kgCO2e) {
+                            totalKgCO2e += parseFloat(data.wax_kgCO2e); // Google Sheet API emissions for wax
+                        }
+                        if (data.wetsuit_kgCO2e) {
+                            totalKgCO2e += parseFloat(data.wetsuit_kgCO2e); // Google Sheet API emissions for wetsuits
+                        }
+                        if (data.midLength_kgCO2e) {
+                            totalKgCO2e += parseFloat(data.midLength_kgCO2e); // Google Sheet API emissions for mid-length boards
+                        }
+                        if (data.shortboard_kgCO2e) {
+                            totalKgCO2e += parseFloat(data.shortboard_kgCO2e); // Google Sheet API emissions for shortboards
+                        }
+                        if (data.longboard_kgCO2e) {
+                            totalKgCO2e += parseFloat(data.longboard_kgCO2e); // Google Sheet API emissions for longboards
                         }
 
-                        // Check if cost is present and display it, otherwise ignore
-                        if (data.cost) {
-                            resultHTML += `<p>Estimated Cost: ${data.cost}</p>`;
-                        }
-
-                        // Set the result HTML in the div
-                        document.getElementById('result').innerHTML = resultHTML;
+                        document.getElementById('result').innerHTML = `
+                        <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
+                    `;
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
                         document.getElementById('result').innerHTML = `<p>Invalid JSON response from server: ${text}</p>`;
@@ -125,7 +168,6 @@
                     document.getElementById('result').innerHTML = `<p>Error calculating emissions.</p>`;
                 });
         };
-
     </script>
 
 </body>
