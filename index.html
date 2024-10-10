@@ -104,25 +104,13 @@
             populateDropdownWithNumbers('longboards');
         };
 
-        // Form submission handler with default value assignments
+        // Form submission handler
         document.getElementById('carbonForm').onsubmit = function (event) {
             event.preventDefault();
 
-            // Collect the form data and assign default values if any fields are empty
             const formData = new FormData(document.getElementById('carbonForm'));
 
-            // Default values for fields that may be empty
-            formData.set('specification', formData.get('specification') || 'average'); // Default to 'average' if empty
-            formData.set('detail', formData.get('detail') || 'average'); // Default to 'average' if empty
-            formData.set('value', formData.get('value') || 0); // Default to 0 if empty
-            formData.set('unit', formData.get('unit') || 'kilometers'); // Default to 'kilometers' if empty
-            formData.set('wax_blocks', formData.get('wax_blocks') || 0); // Default to 0 if empty
-            formData.set('wetsuits', formData.get('wetsuits') || 0); // Default to 0 if empty
-            formData.set('mid_length', formData.get('mid_length') || 0); // Default to 0 if empty
-            formData.set('shortboards', formData.get('shortboards') || 0); // Default to 0 if empty
-            formData.set('longboards', formData.get('longboards') || 0); // Default to 0 if empty
-
-            fetch('https://hook.eu2.make.com/your_webhook_url', {
+            fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
                 method: 'POST',
                 body: formData
             })
@@ -153,7 +141,7 @@
                         }
 
                         document.getElementById('result').innerHTML = `
-                    <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
+                        <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
                     `;
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
