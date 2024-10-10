@@ -114,7 +114,7 @@
             // Default values for fields that may be empty
             formData.set('specification', formData.get('specification') || 'average'); // Default to 'average' if empty
             formData.set('detail', formData.get('detail') || 'average'); // Default to 'average' if empty
-            formData.set('value', formData.get('value') || 0); // Default to 0 if empty
+            formData.set('value', formData.get('value') > 0 ? formData.get('value') : 1); // Default to 1 if distance is 0 or empty
             formData.set('unit', formData.get('unit') || 'kilometers'); // Default to 'kilometers' if empty
             formData.set('wax_blocks', formData.get('wax_blocks') || 0); // Default to 0 if empty
             formData.set('wetsuits', formData.get('wetsuits') || 0); // Default to 0 if empty
@@ -166,6 +166,7 @@
                 });
         };
     </script>
+
 
 </body>
 
