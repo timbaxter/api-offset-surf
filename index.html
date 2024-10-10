@@ -85,49 +85,74 @@
     </div>
 
     <script>
+        // Function to populate a dropdown with numbers from 0 to 50
+        function populateDropdownWithNumbers(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            let options = '';
+            for (let i = 0; i <= 50; i++) {
+                options += `<option value="${i}">${i}</option>`;
+            }
+            dropdown.innerHTML = options;
+        }
+
+        // Call the function to populate each dropdown when the page loads
+        window.onload = function () {
+            populateDropdownWithNumbers('waxBlocks');
+            populateDropdownWithNumbers('wetsuits');
+            populateDropdownWithNumbers('midLength');
+            populateDropdownWithNumbers('shortboards');
+            populateDropdownWithNumbers('longboards');
+        };
+
+        // Form submission handler
         document.getElementById('carbonForm').onsubmit = function (event) {
             event.preventDefault();
 
-            // Create a form data object and set default values for missing fields
-            const formData = {
-                specification: document.getElementById('question1').value || 'average', // Default to 'average' if empty
-                detail: document.getElementById('question2').value || 'average', // Default to 'average' if empty
-                value: document.getElementById('question3').value || 0, // Default to 0 if empty
-                unit: document.getElementById('question4').value || 'kilometers', // Default to 'kilometers' if empty
-                wax_blocks: document.getElementById('waxBlocks')?.value || 0, // Default to 0 if not present or empty
-                wetsuits: document.getElementById('wetsuits')?.value || 0, // Default to 0 if not present or empty
-                mid_length: document.getElementById('midLength')?.value || 0, // Default to 0 if not present or empty
-                shortboards: document.getElementById('shortboards')?.value || 0, // Default to 0 if not present or empty
-                longboards: document.getElementById('longboards')?.value || 0 // Default to 0 if not present or empty
-            };
+            const formData = new FormData(document.getElementById('carbonForm'));
 
-            // Send the data as JSON to the API
-            fetch('https://hook.eu2.make.com/your_webhook_url', {
+            fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
+                body: formData
             })
                 .then(response => response.text())
                 .then(text => {
                     try {
                         const data = JSON.parse(text);
-                        // Display the result in the HTML
+                        let totalKgCO2e = 0;
+
+                        // Combine Klim API data and product emissions
+                        if (data.kgCO2e) {
+                            totalKgCO2e += parseFloat(data.kgCO2e); // Klim API emissions
+                        }
+                        if (data.wax_kgCO2e) {
+                            totalKgCO2e += parseFloat(data.wax_kgCO2e); // Google Sheet API emissions for wax
+                        }
+                        if (data.wetsuit_kgCO2e) {
+                            totalKgCO2e += parseFloat(data.wetsuit_kgCO2e); // Google Sheet API emissions for wetsuits
+                        }
+                        if (data.midLength_kgCO2e) {
+                            totalKgCO2e += parseFloat(data.midLength_kgCO2e); // Google Sheet API emissions for mid-length boards
+                        }
+                        if (data.shortboard_kgCO2e) {
+                            totalKgCO2e += parseFloat(data.shortboard_kgCO2e); // Google Sheet API emissions for shortboards
+                        }
+                        if (data.longboard_kgCO2e) {
+                            totalKgCO2e += parseFloat(data.longboard_kgCO2e); // Google Sheet API emissions for longboards
+                        }
+
                         document.getElementById('result').innerHTML = `
-                <p>Total Carbon Emissions: ${data.total_kgCO2e || 0} kg</p>
-            `;
+                        <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
+                    `;
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
-                        document.getElementById('result').innerHTML = `<p>Response from server: ${text}</p>`;
+                        document.getElementById('result').innerHTML = `<p>Invalid JSON response from server: ${text}</p>`;
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    console.error('Error fetching or processing data:', error);
                     document.getElementById('result').innerHTML = `<p>Error calculating emissions.</p>`;
                 });
         };
-
     </script>
 
 </body>
