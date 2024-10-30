@@ -9,89 +9,166 @@
 
 <body>
     <h1>Carbon Offset Survey</h1>
+    <form id="carbonForm" action="https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq" method="POST">
+        <label for="question1">Car Size (small, medium, large, average):</label><br>
+        <select id="question1" name="specification">
+            <option value="small_car">Small Car</option>
+            <option value="medium_car">Medium Car</option>
+            <option value="large_car">Large Car</option>
+            <option value="average">Average</option>
+        </select><br><br>
 
-    <!-- Your Form -->
-    <form id="carbonOffsetForm">
-        <!-- Car Travel Details -->
-        <label for="carSize">Car Size:</label>
-        <input type="text" id="carSize" name="carSize" required>
+        <label for="question2">Fuel Type (diesel, petrol, hybrid, plug-in hybrid, electric, average):</label><br>
+        <select id="question2" name="detail">
+            <option value="diesel">Diesel</option>
+            <option value="petrol">Petrol</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="plug-in_hybrid_electric_vehicle">Plug-in Hybrid Electric Vehicle</option>
+            <option value="battery_electric_vehicle">Battery Electric Vehicle</option>
+            <option value="average">Average</option>
+        </select><br><br>
 
-        <label for="fuelType">Fuel Type:</label>
-        <input type="text" id="fuelType" name="fuelType" required>
+        <label for="question3">Distance Travelled (km):</label><br>
+        <input type="number" id="question3" name="value" min="0" required><br><br>
 
-        <label for="travelDistance">Travel Distance:</label>
-        <input type="number" id="travelDistance" name="travelDistance" required>
-
-        <label for="distanceUnit">Distance Unit:</label>
-        <select id="distanceUnit" name="distanceUnit" required>
-            <option value="km">Kilometers</option>
+        <label for="question4">Distance Unit (Default: kilometers):</label><br>
+        <select id="question4" name="unit">
+            <option value="kilometers">Kilometers</option>
+            <option value="meters">Meters</option>
+            <option value="centimeters">Centimeters</option>
+            <option value="millimeters">Millimeters</option>
+            <option value="inches">Inches</option>
+            <option value="feet">Feet</option>
+            <option value="yards">Yards</option>
             <option value="miles">Miles</option>
-        </select>
+            <option value="nautical miles">Nautical Miles</option>
+        </select><br><br>
 
-        <!-- Surf Product Purchases -->
-        <label for="waxBlocks">Wax Blocks Purchased:</label>
-        <input type="number" id="waxBlocks" name="waxBlocks">
+        <input type="hidden" name="type" value="travel-land">
+        <input type="hidden" name="activity" value="cars_by_size">
 
-        <label for="wetsuits">Wetsuits Purchased:</label>
-        <input type="number" id="wetsuits" name="wetsuits">
+        <!-- Number of Wax Blocks Purchased -->
+        <label for="waxBlocks">Number of wax blocks purchased in the last year:</label><br>
+        <select id="waxBlocks" name="wax_blocks">
+            <!-- Options from 0 to 50 -->
+        </select><br><br>
 
-        <label for="surfboards">Surfboards Purchased:</label>
-        <input type="number" id="surfboards" name="surfboards">
+        <!-- Number of Wetsuits Purchased -->
+        <label for="wetsuits">Number of new wetsuits purchased in the last year:</label><br>
+        <select id="wetsuits" name="wetsuits">
+            <!-- Options from 0 to 50 -->
+        </select><br><br>
 
-        <!-- Submit Button -->
-        <button type="submit">Calculate Emissions</button>
+        <!-- Number of Mid-Lengths (8ft) Purchased -->
+        <label for="midLength">Number of new mid-lengths (8ft) purchased in the last year:</label><br>
+        <select id="midLength" name="mid_length">
+            <!-- Options from 0 to 50 -->
+        </select><br><br>
+
+        <!-- Number of Shortboards (6ft) Purchased -->
+        <label for="shortboards">Number of new shortboards (6ft) purchased in the last year:</label><br>
+        <select id="shortboards" name="shortboards">
+            <!-- Options from 0 to 50 -->
+        </select><br><br>
+
+        <!-- Number of Longboards (9ft) Purchased -->
+        <label for="longboards">Number of new longboards (9ft) purchased in the last year:</label><br>
+        <select id="longboards" name="longboards">
+            <!-- Options from 0 to 50 -->
+        </select><br><br>
+
+        <input type="submit" value="Calculate Emissions">
     </form>
 
-    <!-- Result Display -->
-    <div id="result"></div>
+    <div id="result">
+        <!-- The response data will be shown here -->
+    </div>
 
-    <!-- JavaScript to Handle Form Submission -->
     <script>
-        async function handleFormSubmit(event) {
-            event.preventDefault(); // Prevent form from reloading the page
-
-            // Collect form data
-            const formData = {
-                carSize: document.querySelector('#carSize').value,
-                fuelType: document.querySelector('#fuelType').value,
-                travelDistance: document.querySelector('#travelDistance').value,
-                distanceUnit: document.querySelector('#distanceUnit').value,
-                waxBlocks: document.querySelector('#waxBlocks').value || 0,
-                wetsuits: document.querySelector('#wetsuits').value || 0,
-                surfboards: document.querySelector('#surfboards').value || 0
-            };
-
-            try {
-                // Fetch request to Make.com
-                const response = await fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                const data = await response.json();
-
-                // Display the results
-                document.getElementById('result').innerHTML = `
-                    <h2>Carbon Emissions Report</h2>
-                    <p>Wax Emissions: ${data.wax_kgCO2e} kg CO₂</p>
-                    <p>Wetsuit Emissions: ${data.wetsuit_kgCO2e} kg CO₂</p>
-                    <p>Mid-Length Board Emissions: ${data.midLength_kgCO2e} kg CO₂</p>
-                    <p>Shortboard Emissions: ${data.shortboard_kgCO2e} kg CO₂</p>
-                    <p>Longboard Emissions: ${data.longboard_kgCO2e} kg CO₂</p>
-                    <p>Total Emissions: ${data.totalEmissions_kgCO2e} kg CO₂</p>
-                `;
-            } catch (error) {
-                console.error('Error fetching or processing data:', error);
-                document.getElementById('result').innerHTML = `<p>Error calculating emissions: ${error.message}</p>`;
+        // Function to populate a dropdown with numbers from 0 to 50
+        function populateDropdownWithNumbers(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            let options = '';
+            for (let i = 0; i <= 50; i++) {
+                options += `<option value="${i}">${i}</option>`;
             }
+            dropdown.innerHTML = options;
         }
 
-        // Add event listener to the form
-        document.getElementById('carbonOffsetForm').addEventListener('submit', handleFormSubmit);
+        // Call the function to populate each dropdown when the page loads
+        window.onload = function () {
+            populateDropdownWithNumbers('waxBlocks');
+            populateDropdownWithNumbers('wetsuits');
+            populateDropdownWithNumbers('midLength');
+            populateDropdownWithNumbers('shortboards');
+            populateDropdownWithNumbers('longboards');
+        };
+
+        // Form submission handler with default value assignments
+        document.getElementById('carbonForm').onsubmit = function (event) {
+            event.preventDefault();
+
+            // Collect the form data and assign default values if any fields are empty
+            const formData = new FormData(document.getElementById('carbonForm'));
+
+            // Default values for fields that may be empty
+            formData.set('specification', formData.get('specification') || 'average'); // Default to 'average' if empty
+            formData.set('detail', formData.get('detail') || 'average'); // Default to 'average' if empty
+            formData.set('value', formData.get('value') > 0 ? formData.get('value') : 1); // Default to 1 if distance is 0 or empty
+            formData.set('unit', formData.get('unit') || 'kilometers'); // Default to 'kilometers' if empty
+            formData.set('wax_blocks', formData.get('wax_blocks') || 0); // Default to 0 if empty
+            formData.set('wetsuits', formData.get('wetsuits') || 0); // Default to 0 if empty
+            formData.set('mid_length', formData.get('mid_length') || 0); // Default to 0 if empty
+            formData.set('shortboards', formData.get('shortboards') || 0); // Default to 0 if empty
+            formData.set('longboards', formData.get('longboards') || 0); // Default to 0 if empty
+
+            fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.text())
+                .then(text => {
+                    try {
+                        const data = JSON.parse(text);
+                        let totalKgCO2e = 0;
+
+                        // Combine Klim API data and product emissions
+                        if (data.hasOwnProperty('kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.kgCO2e) || 0;
+                        }
+                        if (data.hasOwnProperty('wax_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.wax_kgCO2e) || 0;
+                        }
+                        if (data.hasOwnProperty('wetsuit_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.wetsuit_kgCO2e) || 0;
+                        }
+                        if (data.hasOwnProperty('midLength_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.midLength_kgCO2e) || 0;
+                        }
+                        if (data.hasOwnProperty('shortboard_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.shortboard_kgCO2e) || 0;
+                        }
+                        if (data.hasOwnProperty('longboard_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.longboard_kgCO2e) || 0;
+                        }
+
+
+                        document.getElementById('result').innerHTML = `
+                    <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
+                    `;
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                        document.getElementById('result').innerHTML = `<p>Invalid JSON response from server: ${text}</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching or processing data:', error);
+                    document.getElementById('result').innerHTML = `<p>Error calculating emissions.</p>`;
+                });
+        };
     </script>
+
+
 </body>
 
 </html>
