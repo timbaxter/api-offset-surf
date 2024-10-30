@@ -133,24 +133,25 @@
                         let totalKgCO2e = 0;
 
                         // Combine Klim API data and product emissions
-                        if (data.kgCO2e) {
-                            totalKgCO2e += parseFloat(data.kgCO2e); // Klim API emissions
+                        if (data.hasOwnProperty('kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.kgCO2e) || 0;
                         }
-                        if (data.wax_kgCO2e) {
-                            totalKgCO2e += parseFloat(data.wax_kgCO2e); // Google Sheet API emissions for wax
+                        if (data.hasOwnProperty('wax_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.wax_kgCO2e) || 0;
                         }
-                        if (data.wetsuit_kgCO2e) {
-                            totalKgCO2e += parseFloat(data.wetsuit_kgCO2e); // Google Sheet API emissions for wetsuits
+                        if (data.hasOwnProperty('wetsuit_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.wetsuit_kgCO2e) || 0;
                         }
-                        if (data.midLength_kgCO2e) {
-                            totalKgCO2e += parseFloat(data.midLength_kgCO2e); // Google Sheet API emissions for mid-length boards
+                        if (data.hasOwnProperty('midLength_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.midLength_kgCO2e) || 0;
                         }
-                        if (data.shortboard_kgCO2e) {
-                            totalKgCO2e += parseFloat(data.shortboard_kgCO2e); // Google Sheet API emissions for shortboards
+                        if (data.hasOwnProperty('shortboard_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.shortboard_kgCO2e) || 0;
                         }
-                        if (data.longboard_kgCO2e) {
-                            totalKgCO2e += parseFloat(data.longboard_kgCO2e); // Google Sheet API emissions for longboards
+                        if (data.hasOwnProperty('longboard_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.longboard_kgCO2e) || 0;
                         }
+
 
                         document.getElementById('result').innerHTML = `
                     <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
