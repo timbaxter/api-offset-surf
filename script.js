@@ -1,13 +1,11 @@
-then(text => {
-    try {
-        const data = JSON.parse(text);
-        if (data && data.kgCO2e) { // Check if data exists
-            // Continue with total emissions calculations
-        } else {
-            document.getElementById('result').innerHTML = `<p>No emissions data returned.</p>`;
-        }
-    } catch (error) {
-        console.error('Parsing error:', error);
-        document.getElementById('result').innerHTML = `<p>Failed to retrieve valid emissions data.</p>`;
-    }
+fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
+    method: 'POST',
+    body: formData
 })
+    .then(response => response.json()) // Parse as JSON
+    .then(data => {
+        console.log(data); // Log data to see structure
+        let totalKgCO2e = 0;
+        // Your existing code to calculate total emissions
+    })
+
