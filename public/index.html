@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Offset Survey</title>
+    <script src="https://js.stripe.com/v3/"></script> <!-- Stripe library -->
+</head>
+
+<body>
+    <h1>Carbon Offset Survey</h1>
+    <form id="carbonForm" action="https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq" method="POST">
+        <!-- Form content -->
+        <!-- Submit Button -->
+        <input type="submit" value="Calculate Emissions">
+    </form>
+
+    <div id="result">
+        <!-- The response data will be shown here -->
+    </div>
+
+    <button id="checkout-button" style="display: none;">Proceed to Payment</button>
+
+    <script>
+        // Stripe publishable key
+        const stripe = Stripe("your-publishable-key");
+
+        document.getElementById('carbonForm').onsubmit = function (event) {
+            event.preventDefault();
+
+            // Form data collection and fetch request (your existing code)
+            const formData = new FormData(document.getElementById('carbonForm'));
+
+            fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.text())
+                .then(text => {
+                    try {
+                        const data = JSON.parse(text);
+                        let totalKgCO2e = 0;
+
+                        if (data.hasOwnProperty('kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.kgCO2e) || 0;
+                        }
+                        if (data.hasOwnProperty('wax_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.wax_kgCO2e) || 0;
+                        }
+                        if (data.hasOwnProperty('wetsuit_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.wetsuit_kgCO2e) || 0;
+                        }
+                        if (data.hasOwnProperty('midLength_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.midLength_kgCO2e) || 0;
+                        }
+                        if (data.hasOwnProperty('shortboard_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.shortboard_kgCO2e) || 0;
+                        }
+                        if (data.hasOwnProperty('longboard_kgCO2e')) {
+                            totalKgCO2e += parseFloat(data.longboard_kgCO2e) || 0;
+                        }
+
+                        const costPerKg = 3; // USD per kilogram
+                        const totalCost = (totalKgCO2e * costPerKg).toFixed(2);
+
+                        document.getElementById('result').innerHTML = `
+                        <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
+                        <p>Total Offset Cost: $${totalCost}</p>
+                    `;
+
+                        // Show payment button
+                        document.getElementById('checkout-button').style.display = 'inline';
+
+                        // Handle the payment on button click
+                        document.getElementById('checkout-button').onclick = function () {
+                            fetch('your-server-side-endpoint', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ amount: totalCost * 100 }) // Stripe accepts amounts in cents
+                            })
+                                .then(response => response.json())
+                                .then(session => {
+                                    return stripe.redirectToCheckout({ sessionId: session.id });
+                                })
+                                .then(function (result) {
+                                    if (result.error) {
+                                        alert(result.error.message);
+                                    }
+                                })
+                                .catch(error => console.error('Error creating Stripe session:', error));
+                        };
+
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                        document.getElementById('result').innerHTML = `<p>Invalid JSON response from server: ${text}</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching or processing data:', error);
+                    document.getElementById('result').innerHTML = `<p>Error calculating emissions.</p>`;
+                });
+        };
+    </script>
+</body>
+
+</html>
