@@ -36,33 +36,23 @@
 
         <!-- Number of Wax Blocks Purchased -->
         <label for="waxBlocks">Number of wax blocks purchased in the last year:</label><br>
-        <select id="waxBlocks" name="wax_blocks">
-            <!-- Options from 0 to 50 -->
-        </select><br><br>
+        <select id="waxBlocks" name="wax_blocks"></select><br><br>
 
         <!-- Number of Wetsuits Purchased -->
         <label for="wetsuits">Number of new wetsuits purchased in the last year:</label><br>
-        <select id="wetsuits" name="wetsuits">
-            <!-- Options from 0 to 50 -->
-        </select><br><br>
+        <select id="wetsuits" name="wetsuits"></select><br><br>
 
         <!-- Number of Mid-Lengths (8ft) Purchased -->
         <label for="midLength">Number of new mid-lengths (8ft) purchased in the last year:</label><br>
-        <select id="midLength" name="mid_length">
-            <!-- Options from 0 to 50 -->
-        </select><br><br>
+        <select id="midLength" name="mid_length"></select><br><br>
 
         <!-- Number of Shortboards (6ft) Purchased -->
         <label for="shortboards">Number of new shortboards (6ft) purchased in the last year:</label><br>
-        <select id="shortboards" name="shortboards">
-            <!-- Options from 0 to 50 -->
-        </select><br><br>
+        <select id="shortboards" name="shortboards"></select><br><br>
 
         <!-- Number of Longboards (9ft) Purchased -->
         <label for="longboards">Number of new longboards (9ft) purchased in the last year:</label><br>
-        <select id="longboards" name="longboards">
-            <!-- Options from 0 to 50 -->
-        </select><br><br>
+        <select id="longboards" name="longboards"></select><br><br>
 
         <input type="submit" value="Calculate Emissions">
     </form>
@@ -99,15 +89,15 @@
             const formData = new FormData(document.getElementById('carbonForm'));
 
             // Default values for fields that may be empty
-            formData.set('specification', formData.get('specification') || 'average'); // Default to 'average' if empty
-            formData.set('detail', formData.get('detail') || 'average'); // Default to 'average' if empty
-            formData.set('value', formData.get('value') > 0 ? formData.get('value') : 1); // Default to 1 if distance is 0 or empty
-            formData.set('unit', formData.get('unit') || 'kilometers'); // Default to 'kilometers' if empty
-            formData.set('wax_blocks', formData.get('wax_blocks') || 0); // Default to 0 if empty
-            formData.set('wetsuits', formData.get('wetsuits') || 0); // Default to 0 if empty
-            formData.set('mid_length', formData.get('mid_length') || 0); // Default to 0 if empty
-            formData.set('shortboards', formData.get('shortboards') || 0); // Default to 0 if empty
-            formData.set('longboards', formData.get('longboards') || 0); // Default to 0 if empty
+            formData.set('specification', formData.get('specification') || 'average');
+            formData.set('detail', formData.get('detail') || 'average');
+            formData.set('value', formData.get('value') > 0 ? formData.get('value') : 1);
+            formData.set('unit', formData.get('unit') || 'kilometers');
+            formData.set('wax_blocks', formData.get('wax_blocks') || 0);
+            formData.set('wetsuits', formData.get('wetsuits') || 0);
+            formData.set('mid_length', formData.get('mid_length') || 0);
+            formData.set('shortboards', formData.get('shortboards') || 0);
+            formData.set('longboards', formData.get('longboards') || 0);
 
             fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
                 method: 'POST',
@@ -120,29 +110,20 @@
                         let totalKgCO2e = 0;
 
                         // Combine Klim API data and product emissions
-                        if (data.hasOwnProperty('kgCO2e')) {
-                            totalKgCO2e += parseFloat(data.kgCO2e) || 0;
-                        }
-                        if (data.hasOwnProperty('wax_kgCO2e')) {
-                            totalKgCO2e += parseFloat(data.wax_kgCO2e) || 0;
-                        }
-                        if (data.hasOwnProperty('wetsuit_kgCO2e')) {
-                            totalKgCO2e += parseFloat(data.wetsuit_kgCO2e) || 0;
-                        }
-                        if (data.hasOwnProperty('midLength_kgCO2e')) {
-                            totalKgCO2e += parseFloat(data.midLength_kgCO2e) || 0;
-                        }
-                        if (data.hasOwnProperty('shortboard_kgCO2e')) {
-                            totalKgCO2e += parseFloat(data.shortboard_kgCO2e) || 0;
-                        }
-                        if (data.hasOwnProperty('longboard_kgCO2e')) {
-                            totalKgCO2e += parseFloat(data.longboard_kgCO2e) || 0;
-                        }
+                        if (data.hasOwnProperty('kgCO2e')) totalKgCO2e += parseFloat(data.kgCO2e) || 0;
+                        if (data.hasOwnProperty('wax_kgCO2e')) totalKgCO2e += parseFloat(data.wax_kgCO2e) || 0;
+                        if (data.hasOwnProperty('wetsuit_kgCO2e')) totalKgCO2e += parseFloat(data.wetsuit_kgCO2e) || 0;
+                        if (data.hasOwnProperty('midLength_kgCO2e')) totalKgCO2e += parseFloat(data.midLength_kgCO2e) || 0;
+                        if (data.hasOwnProperty('shortboard_kgCO2e')) totalKgCO2e += parseFloat(data.shortboard_kgCO2e) || 0;
+                        if (data.hasOwnProperty('longboard_kgCO2e')) totalKgCO2e += parseFloat(data.longboard_kgCO2e) || 0;
 
+                        // Calculate the total price at 300 cents per kg (3 dollars per kg)
+                        const totalPrice = totalKgCO2e * 300;
 
                         document.getElementById('result').innerHTML = `
-                    <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
-                    `;
+                            <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
+                            <p>Total Price: $${(totalPrice / 100).toFixed(2)}</p>
+                        `;
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
                         document.getElementById('result').innerHTML = `<p>Invalid JSON response from server: ${text}</p>`;
@@ -154,8 +135,6 @@
                 });
         };
     </script>
-
-
 </body>
 
 </html>
