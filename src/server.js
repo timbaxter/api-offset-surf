@@ -31,8 +31,8 @@ app.post('/create-checkout-session', async (req, res) => {
                 quantity: 1,
             }],
             mode: 'payment',
-            success_url: 'https://your-website.com/success',
-            cancel_url: 'https://your-website.com/cancel',
+            success_url: 'https://offsetsurf.com/success',
+            cancel_url: 'https://offsetsurf.com/cancel',
         });
 
         res.json({ id: session.id });
