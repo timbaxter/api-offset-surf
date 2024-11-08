@@ -119,10 +119,17 @@
 
                         // Calculate the total price at 300 cents per kg (3 dollars per kg)
                         const totalPrice = totalKgCO2e * 300;
+                        const priceInDollars = (totalPrice / 100).toFixed(2);
+
+                        // Create a Stripe link with the calculated price
+                        const stripeLink = `YOUR_STRIPE_LINK?amount=${totalPrice}`;
 
                         document.getElementById('result').innerHTML = `
                             <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
-                            <p>Total Price: $${(totalPrice / 100).toFixed(2)}</p>
+                            <p>Total Price: $${priceInDollars}</p>
+                            <a href="${stripeLink}" target="_blank">
+                                <button>Proceed to Payment</button>
+                            </a>
                         `;
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
