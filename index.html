@@ -10,8 +10,47 @@
 
 <body>
     <h1>Carbon Offset Survey</h1>
-    <form id="carbonForm" action="https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq" method="POST">
-        <!-- Survey questions here... -->
+    <form id="carbonForm">
+
+        <!-- Car size question -->
+        <label for="question1">Car Size (small, medium, large, average):</label><br>
+        <select id="question1" name="specification">
+            <option value="small_car">Small Car</option>
+            <option value="medium_car">Medium Car</option>
+            <option value="large_car">Large Car</option>
+            <option value="average">Average</option>
+        </select><br><br>
+
+        <!-- Fuel type question -->
+        <label for="question2">Fuel Type (diesel, petrol, hybrid, plug-in hybrid, electric, average):</label><br>
+        <select id="question2" name="detail">
+            <option value="diesel">Diesel</option>
+            <option value="petrol">Petrol</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="plug-in_hybrid_electric_vehicle">Plug-in Hybrid Electric Vehicle</option>
+            <option value="battery_electric_vehicle">Battery Electric Vehicle</option>
+            <option value="average">Average</option>
+        </select><br><br>
+
+        <!-- Distance traveled question -->
+        <label for="question3">Distance Traveled (km):</label><br>
+        <input type="number" id="question3" name="value" min="0" required><br><br>
+
+        <!-- Other surfboard-related questions -->
+        <label for="waxBlocks">Number of wax blocks purchased in the last year:</label><br>
+        <select id="waxBlocks" name="wax_blocks"></select><br><br>
+
+        <label for="wetsuits">Number of new wetsuits purchased in the last year:</label><br>
+        <select id="wetsuits" name="wetsuits"></select><br><br>
+
+        <label for="midLength">Number of new mid-lengths (8ft) purchased in the last year:</label><br>
+        <select id="midLength" name="mid_length"></select><br><br>
+
+        <label for="shortboards">Number of new shortboards (6ft) purchased in the last year:</label><br>
+        <select id="shortboards" name="shortboards"></select><br><br>
+
+        <label for="longboards">Number of new longboards (9ft) purchased in the last year:</label><br>
+        <select id="longboards" name="longboards"></select><br><br>
 
         <input type="submit" value="Calculate Emissions">
     </form>
@@ -21,6 +60,7 @@
     </div>
 
     <script>
+        // Function to populate dropdowns with numbers from 0 to 50
         function populateDropdownWithNumbers(dropdownId) {
             const dropdown = document.getElementById(dropdownId);
             let options = '';
@@ -30,6 +70,7 @@
             dropdown.innerHTML = options;
         }
 
+        // Populate dropdowns when the page loads
         window.onload = function () {
             populateDropdownWithNumbers('waxBlocks');
             populateDropdownWithNumbers('wetsuits');
@@ -38,22 +79,31 @@
             populateDropdownWithNumbers('longboards');
         };
 
+        // Form submission handler
         document.getElementById('carbonForm').onsubmit = function (event) {
             event.preventDefault();
             const formData = new FormData(document.getElementById('carbonForm'));
-            formData.set('specification', formData.get('specification') || 'average');
-            formData.set('detail', formData.get('detail') || 'average');
-            formData.set('value', formData.get('value') > 0 ? formData.get('value') : 1);
-            formData.set('unit', formData.get('unit') || 'kilometers');
-            formData.set('wax_blocks', formData.get('wax_blocks') || 0);
-            formData.set('wetsuits', formData.get('wetsuits') || 0);
-            formData.set('mid_length', formData.get('mid_length') || 0);
-            formData.set('shortboards', formData.get('shortboards') || 0);
-            formData.set('longboards', formData.get('longboards') || 0);
 
+            // Prepare data in JSON format
+            const jsonData = {
+                specification: formData.get('specification') || 'average',
+                detail: formData.get('detail') || 'average',
+                value: formData.get('value') > 0 ? formData.get('value') : 1,
+                unit: 'kilometers',
+                wax_blocks: formData.get('wax_blocks') || 0,
+                wetsuits: formData.get('wetsuits') || 0,
+                mid_length: formData.get('mid_length') || 0,
+                shortboards: formData.get('shortboards') || 0,
+                longboards: formData.get('longboards') || 0
+            };
+
+            // Send JSON data to Make.com webhook
             fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
             })
                 .then(response => response.text())
                 .then(text => {
