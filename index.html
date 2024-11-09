@@ -122,7 +122,7 @@
                         const priceInDollars = (totalPrice / 100).toFixed(2);
 
                         // Create a Stripe link with the calculated price
-                        const stripeLink = `YOUR_STRIPE_LINK?amount=${totalPrice}`;
+                        const stripeLink = `https://buy.stripe.com/14kcOrbNveKq6swaEE?amount=${totalPrice}`;
 
                         document.getElementById('result').innerHTML = `
                             <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
