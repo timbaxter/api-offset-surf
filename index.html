@@ -5,25 +5,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carbon Offset Survey</title>
-    <!-- Stripe script for the Buy Button -->
     <script async src="https://js.stripe.com/v3/buy-button.js"></script>
 </head>
 
 <body>
     <h1>Carbon Offset Survey</h1>
     <form id="carbonForm" action="https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq" method="POST">
-        <!-- Form contents here -->
+        <!-- Survey questions here... -->
+
         <input type="submit" value="Calculate Emissions">
     </form>
 
     <div id="result">
-        <!-- Emissions results and Stripe Buy Button will be shown here -->
+        <!-- The response data will be shown here -->
     </div>
 
     <script>
+        function populateDropdownWithNumbers(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            let options = '';
+            for (let i = 0; i <= 50; i++) {
+                options += `<option value="${i}">${i}</option>`;
+            }
+            dropdown.innerHTML = options;
+        }
+
+        window.onload = function () {
+            populateDropdownWithNumbers('waxBlocks');
+            populateDropdownWithNumbers('wetsuits');
+            populateDropdownWithNumbers('midLength');
+            populateDropdownWithNumbers('shortboards');
+            populateDropdownWithNumbers('longboards');
+        };
+
         document.getElementById('carbonForm').onsubmit = function (event) {
             event.preventDefault();
             const formData = new FormData(document.getElementById('carbonForm'));
+            formData.set('specification', formData.get('specification') || 'average');
+            formData.set('detail', formData.get('detail') || 'average');
+            formData.set('value', formData.get('value') > 0 ? formData.get('value') : 1);
+            formData.set('unit', formData.get('unit') || 'kilometers');
+            formData.set('wax_blocks', formData.get('wax_blocks') || 0);
+            formData.set('wetsuits', formData.get('wetsuits') || 0);
+            formData.set('mid_length', formData.get('mid_length') || 0);
+            formData.set('shortboards', formData.get('shortboards') || 0);
+            formData.set('longboards', formData.get('longboards') || 0);
 
             fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
                 method: 'POST',
@@ -34,23 +60,21 @@
                     try {
                         const data = JSON.parse(text);
                         let totalKgCO2e = 0;
-
                         if (data.hasOwnProperty('kgCO2e')) totalKgCO2e += parseFloat(data.kgCO2e) || 0;
-                        if (data.hasOwnProperty('wax_kgCO2e')) totalKgCO2e += parseFloat(data.wax_kgCO2e) || 0;
-                        // Add other kgCO2e items if present
 
                         const totalPrice = totalKgCO2e * 300;
+                        const priceInDollars = (totalPrice / 100).toFixed(2);
 
                         document.getElementById('result').innerHTML = `
-                            <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
-                            <p>Total Price: $${(totalPrice / 100).toFixed(2)}</p>
-                            <stripe-buy-button
-                              buy-button-id="buy_btn_1QJMBlGMPVF7Ot63NAzUdcl5"
-                              publishable-key="pk_live_51QJ4QiGMPVF7Ot63idAnXwN0U81mL00lK9QIEomIIg4LwS13wdquVyQ0pJm3ZmGXfyrowovzlYWh64sJd6D8ZOJh00aqaIpQW6"
-                              data-amount="${totalPrice}"
-                            >
-                            </stripe-buy-button>
-                        `;
+                        <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
+                        <p>Total Price: $${priceInDollars}</p>
+                        <stripe-buy-button
+                            buy-button-id="buy_btn_1QJMBlGMPVF7Ot63NAzUdcl5"
+                            publishable-key="pk_live_51QJ4QiGMPVF7Ot63idAnXwN0U81mL00lK9QIEomIIg4LwS13wdquVyQ0pJm3ZmGXfyrowovzlYWh64sJd6D8ZOJh00aqaIpQW6"
+                            amount="${totalPrice}"
+                        >
+                        </stripe-buy-button>
+                    `;
                     } catch (error) {
                         console.error('Error parsing JSON:', error);
                         document.getElementById('result').innerHTML = `<p>Invalid JSON response from server: ${text}</p>`;
