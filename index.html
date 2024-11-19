@@ -10,6 +10,7 @@
 <body>
     <h1>Carbon Offset Survey</h1>
     <form id="carbonForm" action="https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq" method="POST">
+        <!-- Car Size Question -->
         <label for="question1">Car Size (small, medium, large, average):</label><br>
         <select id="question1" name="specification">
             <option value="small_car">Small Car</option>
@@ -18,6 +19,7 @@
             <option value="average">Average</option>
         </select><br><br>
 
+        <!-- Fuel Type Question -->
         <label for="question2">Fuel Type (diesel, petrol, hybrid, plug-in hybrid, electric, average):</label><br>
         <select id="question2" name="detail">
             <option value="diesel">Diesel</option>
@@ -28,27 +30,32 @@
             <option value="average">Average</option>
         </select><br><br>
 
+        <!-- Distance Traveled -->
         <label for="question3">Distance Traveled (km):</label><br>
         <input type="number" id="question3" name="value" min="0" required><br><br>
 
-        <!-- Add hidden input for unit -->
+        <!-- Hidden Inputs -->
         <input type="hidden" id="unit" name="unit" value="kilometers">
-
         <input type="hidden" name="type" value="travel-land">
         <input type="hidden" name="activity" value="cars_by_size">
 
+        <!-- Wax Blocks Purchased -->
         <label for="waxBlocks">Number of wax blocks purchased in the last year:</label><br>
         <select id="waxBlocks" name="wax_blocks"></select><br><br>
 
+        <!-- Wetsuits Purchased -->
         <label for="wetsuits">Number of new wetsuits purchased in the last year:</label><br>
         <select id="wetsuits" name="wetsuits"></select><br><br>
 
+        <!-- Mid-Length Boards Purchased -->
         <label for="midLength">Number of new mid-lengths (8ft) purchased in the last year:</label><br>
         <select id="midLength" name="mid_length"></select><br><br>
 
+        <!-- Shortboards Purchased -->
         <label for="shortboards">Number of new shortboards (6ft) purchased in the last year:</label><br>
         <select id="shortboards" name="shortboards"></select><br><br>
 
+        <!-- Longboards Purchased -->
         <label for="longboards">Number of new longboards (9ft) purchased in the last year:</label><br>
         <select id="longboards" name="longboards"></select><br><br>
 
@@ -70,7 +77,7 @@
             dropdown.innerHTML = options;
         }
 
-        // Call the function to populate each dropdown when the page loads
+        // Populate dropdowns on page load
         window.onload = function () {
             populateDropdownWithNumbers('waxBlocks');
             populateDropdownWithNumbers('wetsuits');
@@ -91,6 +98,10 @@
             })
                 .then(response => response.json())
                 .then(data => {
+                    // Log the entire response for debugging
+                    console.log('Response data:', data);
+
+                    // Check if Stripe_payment_link exists in the response
                     if (data.Stripe_payment_link) {
                         document.getElementById('result').innerHTML = `
                             <p>Total Carbon Emissions: ${data.kgCO2e} kg</p>
@@ -99,12 +110,19 @@
                             </a>
                         `;
                     } else {
-                        document.getElementById('result').innerHTML = `<p>Stripe link not found in response.</p>`;
+                        // Display error and log the response
+                        document.getElementById('result').innerHTML = `
+                            <p>Error: Stripe link not found in the response. Please try again later.</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        `;
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching or processing data:', error);
-                    document.getElementById('result').innerHTML = `<p>Error calculating emissions.</p>`;
+                    document.getElementById('result').innerHTML = `
+                        <p>Error calculating emissions. Please try again later.</p>
+                        <pre>${error.message}</pre>
+                    `;
                 });
         };
     </script>
