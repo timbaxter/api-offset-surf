@@ -99,7 +99,7 @@
                 .then(response => response.text()) // Fetch the response as plain text
                 .then(text => {
                     try {
-                        // Try parsing the response as JSON
+                        // Attempt to parse the response as JSON
                         const data = JSON.parse(text);
                         console.log('Response data:', data);
 
@@ -120,15 +120,18 @@
                             `;
                         }
                     } catch (e) {
-                        // Handle the case where the response is plain text (Stripe link only)
+                        // Handle non-JSON responses like "Queue is full."
                         console.error('Error parsing JSON:', e, 'Raw response:', text);
 
-                        document.getElementById('result').innerHTML = `
-                            <p>Total Carbon Emissions: Response incomplete.</p>
-                            <a href="${text}" target="_blank">
-                                <button>Proceed to Payment</button>
-                            </a>
-                        `;
+                        if (text.includes('Queue is full')) {
+                            document.getElementById('result').innerHTML = `
+                                <p>Error: The server is busy. Please try again later.</p>
+                            `;
+                        } else {
+                            document.getElementById('result').innerHTML = `
+                                <p>Unexpected server response: ${text}</p>
+                            `;
+                        }
                     }
                 })
                 .catch(error => {
@@ -140,6 +143,5 @@
                 });
         };
     </script>
-</body>
 
 </html>
