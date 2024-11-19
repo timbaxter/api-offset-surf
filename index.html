@@ -67,6 +67,26 @@
     </div>
 
     <script>
+        // Function to populate a dropdown with numbers from 0 to 50
+        function populateDropdownWithNumbers(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            let options = '';
+            for (let i = 0; i <= 50; i++) {
+                options += `<option value="${i}">${i}</option>`;
+            }
+            dropdown.innerHTML = options;
+        }
+
+        // Populate dropdowns on page load
+        window.onload = function () {
+            populateDropdownWithNumbers('waxBlocks');
+            populateDropdownWithNumbers('wetsuits');
+            populateDropdownWithNumbers('midLength');
+            populateDropdownWithNumbers('shortboards');
+            populateDropdownWithNumbers('longboards');
+        };
+
+        // Form submission handler
         document.getElementById('carbonForm').onsubmit = function (event) {
             event.preventDefault();
 
@@ -81,21 +101,19 @@
                     // Log the entire response for debugging
                     console.log('Response data:', data);
 
-                    const kgCO2e = data.kgCO2e || 'N/A';
-                    const stripeLink = data.Stripe_payment_link || null;
-
-                    if (stripeLink) {
+                    // Check if Stripe_payment_link exists in the response
+                    if (data.Stripe_payment_link) {
                         document.getElementById('result').innerHTML = `
-                            <p>Total Carbon Emissions: ${kgCO2e} kg</p>
-                            <a href="${stripeLink}" target="_blank">
+                            <p>Total Carbon Emissions: ${data.kgCO2e} kg</p>
+                            <a href="${data.Stripe_payment_link}" target="_blank">
                                 <button>Proceed to Payment</button>
                             </a>
                         `;
                     } else {
-                        // Display a fallback message
+                        // Display error and log the response
                         document.getElementById('result').innerHTML = `
-                            <p>Total Carbon Emissions: ${kgCO2e} kg</p>
-                            <p>Error: Stripe payment link is missing. Please try again later.</p>
+                            <p>Error: Stripe link not found in the response. Please try again later.</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
                         `;
                     }
                 })
