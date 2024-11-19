@@ -31,26 +31,9 @@
         <label for="question3">Distance Traveled (km):</label><br>
         <input type="number" id="question3" name="value" min="0" required><br><br>
 
-        <!-- Add hidden input for unit -->
         <input type="hidden" id="unit" name="unit" value="kilometers">
-
         <input type="hidden" name="type" value="travel-land">
         <input type="hidden" name="activity" value="cars_by_size">
-
-        <label for="waxBlocks">Number of wax blocks purchased in the last year:</label><br>
-        <select id="waxBlocks" name="wax_blocks"></select><br><br>
-
-        <label for="wetsuits">Number of new wetsuits purchased in the last year:</label><br>
-        <select id="wetsuits" name="wetsuits"></select><br><br>
-
-        <label for="midLength">Number of new mid-lengths (8ft) purchased in the last year:</label><br>
-        <select id="midLength" name="mid_length"></select><br><br>
-
-        <label for="shortboards">Number of new shortboards (6ft) purchased in the last year:</label><br>
-        <select id="shortboards" name="shortboards"></select><br><br>
-
-        <label for="longboards">Number of new longboards (9ft) purchased in the last year:</label><br>
-        <select id="longboards" name="longboards"></select><br><br>
 
         <input type="submit" value="Calculate Emissions">
     </form>
@@ -60,26 +43,6 @@
     </div>
 
     <script>
-        // Function to populate a dropdown with numbers from 0 to 50
-        function populateDropdownWithNumbers(dropdownId) {
-            const dropdown = document.getElementById(dropdownId);
-            let options = '';
-            for (let i = 0; i <= 50; i++) {
-                options += `<option value="${i}">${i}</option>`;
-            }
-            dropdown.innerHTML = options;
-        }
-
-        // Call the function to populate each dropdown when the page loads
-        window.onload = function () {
-            populateDropdownWithNumbers('waxBlocks');
-            populateDropdownWithNumbers('wetsuits');
-            populateDropdownWithNumbers('midLength');
-            populateDropdownWithNumbers('shortboards');
-            populateDropdownWithNumbers('longboards');
-        };
-
-        // Form submission handler
         document.getElementById('carbonForm').onsubmit = function (event) {
             event.preventDefault();
 
@@ -91,6 +54,10 @@
             })
                 .then(response => response.json())
                 .then(data => {
+                    // Log the entire response for debugging
+                    console.log('Response data:', data);
+
+                    // Check if Stripe_payment_link exists in the response
                     if (data.Stripe_payment_link) {
                         document.getElementById('result').innerHTML = `
                             <p>Total Carbon Emissions: ${data.kgCO2e} kg</p>
@@ -99,12 +66,19 @@
                             </a>
                         `;
                     } else {
-                        document.getElementById('result').innerHTML = `<p>Stripe link not found in response.</p>`;
+                        // Display a clear error message if the Stripe link is missing
+                        document.getElementById('result').innerHTML = `
+                            <p>Error: Stripe link not found in the response. Please try again later.</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        `;
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching or processing data:', error);
-                    document.getElementById('result').innerHTML = `<p>Error calculating emissions.</p>`;
+                    document.getElementById('result').innerHTML = `
+                        <p>Error calculating emissions. Please try again later.</p>
+                        <pre>${error.message}</pre>
+                    `;
                 });
         };
     </script>
