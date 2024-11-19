@@ -5,14 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carbon Offset Survey</title>
-    <script async src="https://js.stripe.com/v3/buy-button.js"></script>
 </head>
 
 <body>
     <h1>Carbon Offset Survey</h1>
     <form id="carbonForm">
-
-        <!-- Car size question -->
         <label for="question1">Car Size (small, medium, large, average):</label><br>
         <select id="question1" name="specification">
             <option value="small_car">Small Car</option>
@@ -21,7 +18,6 @@
             <option value="average">Average</option>
         </select><br><br>
 
-        <!-- Fuel type question -->
         <label for="question2">Fuel Type (diesel, petrol, hybrid, plug-in hybrid, electric, average):</label><br>
         <select id="question2" name="detail">
             <option value="diesel">Diesel</option>
@@ -32,23 +28,29 @@
             <option value="average">Average</option>
         </select><br><br>
 
-        <!-- Distance traveled question -->
         <label for="question3">Distance Traveled (km):</label><br>
         <input type="number" id="question3" name="value" min="0" required><br><br>
 
-        <!-- Other surfboard-related questions -->
+        <input type="hidden" name="type" value="travel-land">
+        <input type="hidden" name="activity" value="cars_by_size">
+
+        <!-- Number of Wax Blocks Purchased -->
         <label for="waxBlocks">Number of wax blocks purchased in the last year:</label><br>
         <select id="waxBlocks" name="wax_blocks"></select><br><br>
 
+        <!-- Number of Wetsuits Purchased -->
         <label for="wetsuits">Number of new wetsuits purchased in the last year:</label><br>
         <select id="wetsuits" name="wetsuits"></select><br><br>
 
+        <!-- Number of Mid-Lengths (8ft) Purchased -->
         <label for="midLength">Number of new mid-lengths (8ft) purchased in the last year:</label><br>
         <select id="midLength" name="mid_length"></select><br><br>
 
+        <!-- Number of Shortboards (6ft) Purchased -->
         <label for="shortboards">Number of new shortboards (6ft) purchased in the last year:</label><br>
         <select id="shortboards" name="shortboards"></select><br><br>
 
+        <!-- Number of Longboards (9ft) Purchased -->
         <label for="longboards">Number of new longboards (9ft) purchased in the last year:</label><br>
         <select id="longboards" name="longboards"></select><br><br>
 
@@ -60,7 +62,7 @@
     </div>
 
     <script>
-        // Function to populate dropdowns with numbers from 0 to 50
+        // Function to populate a dropdown with numbers from 0 to 50
         function populateDropdownWithNumbers(dropdownId) {
             const dropdown = document.getElementById(dropdownId);
             let options = '';
@@ -70,7 +72,7 @@
             dropdown.innerHTML = options;
         }
 
-        // Populate dropdowns when the page loads
+        // Populate each dropdown when the page loads
         window.onload = function () {
             populateDropdownWithNumbers('waxBlocks');
             populateDropdownWithNumbers('wetsuits');
@@ -82,57 +84,29 @@
         // Form submission handler
         document.getElementById('carbonForm').onsubmit = function (event) {
             event.preventDefault();
+
             const formData = new FormData(document.getElementById('carbonForm'));
 
-            // Prepare data in JSON format
-            const jsonData = {
-                specification: formData.get('specification') || 'average',
-                detail: formData.get('detail') || 'average',
-                value: formData.get('value') > 0 ? formData.get('value') : 1,
-                unit: 'kilometers',
-                wax_blocks: formData.get('wax_blocks') || 0,
-                wetsuits: formData.get('wetsuits') || 0,
-                mid_length: formData.get('mid_length') || 0,
-                shortboards: formData.get('shortboards') || 0,
-                longboards: formData.get('longboards') || 0
-            };
-
-            // Send JSON data to Make.com webhook
             fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(jsonData)
+                body: formData
             })
-                .then(response => response.text())
-                .then(text => {
-                    try {
-                        const data = JSON.parse(text);
-                        let totalKgCO2e = 0;
-                        if (data.hasOwnProperty('kgCO2e')) totalKgCO2e += parseFloat(data.kgCO2e) || 0;
-
-                        const totalPrice = totalKgCO2e * 300;
-                        const priceInDollars = (totalPrice / 100).toFixed(2);
-
+                .then(response => response.json())
+                .then(data => {
+                    if (data.Stripe_payment_link) {
                         document.getElementById('result').innerHTML = `
-                        <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
-                        <p>Total Price: $${priceInDollars}</p>
-                        <stripe-buy-button
-                            buy-button-id="buy_btn_1QJMBlGMPVF7Ot63NAzUdcl5"
-                            publishable-key="pk_live_51QJ4QiGMPVF7Ot63idAnXwN0U81mL00lK9QIEomIIg4LwS13wdquVyQ0pJm3ZmGXfyrowovzlYWh64sJd6D8ZOJh00aqaIpQW6"
-                            amount="${totalPrice}"
-                        >
-                        </stripe-buy-button>
-                    `;
-                    } catch (error) {
-                        console.error('Error parsing JSON:', error);
-                        document.getElementById('result').innerHTML = `<p>Invalid JSON response from server: ${text}</p>`;
+                            <p>Total Carbon Emissions: ${data.kgCO2e.trim()} kg</p>
+                            <a href="${data.Stripe_payment_link}" target="_blank">
+                                <button>Pay Now</button>
+                            </a>
+                        `;
+                    } else {
+                        document.getElementById('result').innerHTML = '<p>Error: Payment link could not be generated.</p>';
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching or processing data:', error);
-                    document.getElementById('result').innerHTML = `<p>Error calculating emissions.</p>`;
+                    console.error('Error:', error);
+                    document.getElementById('result').innerHTML = '<p>There was an error processing your request.</p>';
                 });
         };
     </script>
