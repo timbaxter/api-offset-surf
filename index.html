@@ -9,7 +9,7 @@
 
 <body>
     <h1>Carbon Offset Survey</h1>
-    <form id="carbonForm">
+    <form id="carbonForm" action="https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq" method="POST">
         <label for="question1">Car Size (small, medium, large, average):</label><br>
         <select id="question1" name="specification">
             <option value="small_car">Small Car</option>
@@ -72,7 +72,7 @@
             dropdown.innerHTML = options;
         }
 
-        // Populate each dropdown when the page loads
+        // Call the function to populate each dropdown when the page loads
         window.onload = function () {
             populateDropdownWithNumbers('waxBlocks');
             populateDropdownWithNumbers('wetsuits');
@@ -81,32 +81,64 @@
             populateDropdownWithNumbers('longboards');
         };
 
-        // Form submission handler
+        // Form submission handler with default value assignments
         document.getElementById('carbonForm').onsubmit = function (event) {
             event.preventDefault();
 
+            // Collect the form data and assign default values if any fields are empty
             const formData = new FormData(document.getElementById('carbonForm'));
+
+            // Default values for fields that may be empty
+            formData.set('specification', formData.get('specification') || 'average');
+            formData.set('detail', formData.get('detail') || 'average');
+            formData.set('value', formData.get('value') > 0 ? formData.get('value') : 1);
+            formData.set('unit', formData.get('unit') || 'kilometers');
+            formData.set('wax_blocks', formData.get('wax_blocks') || 0);
+            formData.set('wetsuits', formData.get('wetsuits') || 0);
+            formData.set('mid_length', formData.get('mid_length') || 0);
+            formData.set('shortboards', formData.get('shortboards') || 0);
+            formData.set('longboards', formData.get('longboards') || 0);
 
             fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
                 method: 'POST',
                 body: formData
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.Stripe_payment_link) {
+                .then(response => response.text())
+                .then(text => {
+                    try {
+                        const data = JSON.parse(text);
+                        let totalKgCO2e = 0;
+
+                        // Combine Klim API data and product emissions
+                        if (data.hasOwnProperty('kgCO2e')) totalKgCO2e += parseFloat(data.kgCO2e) || 0;
+                        if (data.hasOwnProperty('wax_kgCO2e')) totalKgCO2e += parseFloat(data.wax_kgCO2e) || 0;
+                        if (data.hasOwnProperty('wetsuit_kgCO2e')) totalKgCO2e += parseFloat(data.wetsuit_kgCO2e) || 0;
+                        if (data.hasOwnProperty('midLength_kgCO2e')) totalKgCO2e += parseFloat(data.midLength_kgCO2e) || 0;
+                        if (data.hasOwnProperty('shortboard_kgCO2e')) totalKgCO2e += parseFloat(data.shortboard_kgCO2e) || 0;
+                        if (data.hasOwnProperty('longboard_kgCO2e')) totalKgCO2e += parseFloat(data.longboard_kgCO2e) || 0;
+
+                        // Calculate the total price at 300 cents per kg (3 dollars per kg)
+                        const totalPrice = totalKgCO2e * 300;
+                        const priceInDollars = (totalPrice / 100).toFixed(2);
+
+                        // Create a Stripe link with the calculated price
+                        const stripeLink = `https://buy.stripe.com/14kcOrbNveKq6swaEE?amount=${totalPrice}`;
+
                         document.getElementById('result').innerHTML = `
-                            <p>Total Carbon Emissions: ${data.kgCO2e.trim()} kg</p>
-                            <a href="${data.Stripe_payment_link}" target="_blank">
-                                <button>Pay Now</button>
+                            <p>Total Carbon Emissions: ${totalKgCO2e.toFixed(2)} kg</p>
+                            <p>Total Price: $${priceInDollars}</p>
+                            <a href="${stripeLink}" target="_blank">
+                                <button>Proceed to Payment</button>
                             </a>
                         `;
-                    } else {
-                        document.getElementById('result').innerHTML = '<p>Error: Payment link could not be generated.</p>';
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                        document.getElementById('result').innerHTML = `<p>Invalid JSON response from server: ${text}</p>`;
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('result').innerHTML = '<p>There was an error processing your request.</p>';
+                    console.error('Error fetching or processing data:', error);
+                    document.getElementById('result').innerHTML = `<p>Error calculating emissions.</p>`;
                 });
         };
     </script>
