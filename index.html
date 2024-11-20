@@ -110,7 +110,7 @@
                         console.log('Stripe payment link:', data.stripe_payment_link); // Log the payment link specifically
 
                         const kgCO2e = data.kgCO2e || 'N/A';
-                        const stripeLink = data.stripe_payment_link || data.url || null;
+                        const stripeLink = data.stripe_payment_link || null;
 
 
                         if (stripeLink) {
