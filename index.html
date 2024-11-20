@@ -92,72 +92,56 @@
 
             const formData = new FormData(document.getElementById('carbonForm'));
 
-            document.getElementById('carbonForm').onsubmit = function (event) {
-                event.preventDefault(); // Prevent form submission
+            fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    console.log('Fetch Response Status:', response.status); // Log status code
+                    console.log('Fetch Response Headers:', response.headers); // Log headers
+                    return response.text(); // Get raw text for debugging
+                })
+                .then(text => {
+                    console.log('Raw Response Text:', text); // Log raw response
 
-                // Mock response to simulate Make.com output
-                const mockResponse = {
-                    kgCO2e: 501.28,
-                    stripe_payment_link: "https://buy.stripe.com/example_mock_link"
-                };
+                    try {
+                        const data = JSON.parse(text); // Parse the JSON response
+                        console.log('Parsed Response:', data); // Log the parsed response
+                        console.log('Stripe payment link:', data.stripe_payment_link); // Log the payment link specifically
 
-                console.log("Using mock response:", mockResponse);
-
-                // Simulate rendering the results on your webpage
-                const kgCO2e = mockResponse.kgCO2e || 'N/A';
-                const stripeLink = mockResponse.stripe_payment_link || null;
-
-                if (stripeLink) {
-                    document.getElementById('result').innerHTML = `
-            <p>Total Carbon Emissions: ${kgCO2e} kg</p>
-            <a href="${stripeLink}" target="_blank">
-                <button>Proceed to Payment</button>
-            </a>
-        `;
-                } else {
-                    console.error('Stripe payment link missing in mock response:', mockResponse);
-                    document.getElementById('result').innerHTML = `
-            <p>Total Carbon Emissions: ${kgCO2e} kg</p>
-            <p>Error: Stripe payment link is missing. Please contact support.</p>
-        `;
-                }
-            };
-
-            console.log('Stripe payment link:', data.stripe_payment_link); // Log the payment link specifically
-
-            const kgCO2e = data.kgCO2e || 'N/A';
-            const stripeLink = data.stripe_payment_link || data.url || null;
+                        const kgCO2e = data.kgCO2e || 'N/A';
+                        const stripeLink = data.stripe_payment_link || data.url || null;
 
 
-            if (stripeLink) {
-                document.getElementById('result').innerHTML = `
+                        if (stripeLink) {
+                            document.getElementById('result').innerHTML = `
                         <p>Total Carbon Emissions: ${kgCO2e} kg</p>
                         <a href="${stripeLink}" target="_blank">
                             <button>Proceed to Payment</button>
                         </a>
                     `;
-            } else {
-                console.error('Stripe payment link missing:', data);
-                document.getElementById('result').innerHTML = `
+                        } else {
+                            console.error('Stripe payment link missing:', data);
+                            document.getElementById('result').innerHTML = `
                         <p>Total Carbon Emissions: ${kgCO2e} kg</p>
                         <p>Error: Stripe payment link is missing. Please try again later.</p>
                     `;
-            }
-        } catch (e) {
-            console.error('Error parsing JSON:', e, 'Raw response:', text);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing JSON:', e, 'Raw response:', text);
 
-            document.getElementById('result').innerHTML = `
+                        document.getElementById('result').innerHTML = `
                     <p>Unexpected server response: ${text}</p>
                 `;
-        }
+                    }
                 })
-                .catch (error => {
-            console.error('Error during Fetch:', error);
-            document.getElementById('result').innerHTML = `
+                .catch(error => {
+                    console.error('Error during Fetch:', error);
+                    document.getElementById('result').innerHTML = `
                 <p>Error calculating emissions. Please try again later.</p>
                 <pre>${error.message}</pre>
             `;
-        });
+                });
         };
 
 
