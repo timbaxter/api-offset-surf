@@ -96,10 +96,9 @@
                 method: 'POST',
                 body: formData
             })
-                .then(response => response.text()) // Fetch the response as plain text
+                .then(response => response.text())
                 .then(text => {
                     try {
-                        // Attempt to parse the response as JSON
                         const data = JSON.parse(text);
                         console.log('Response data:', data);
 
@@ -108,38 +107,37 @@
 
                         if (stripeLink) {
                             document.getElementById('result').innerHTML = `
-                                <p>Total Carbon Emissions: ${kgCO2e} kg</p>
-                                <a href="${stripeLink}" target="_blank">
-                                    <button>Proceed to Payment</button>
-                                </a>
-                            `;
+                        <p>Total Carbon Emissions: ${kgCO2e} kg</p>
+                        <a href="${stripeLink}" target="_blank">
+                            <button>Proceed to Payment</button>
+                        </a>
+                    `;
                         } else {
                             document.getElementById('result').innerHTML = `
-                                <p>Total Carbon Emissions: ${kgCO2e} kg</p>
-                                <p>Error: Stripe payment link is missing. Please try again later.</p>
-                            `;
+                        <p>Total Carbon Emissions: ${kgCO2e} kg</p>
+                        <p>Error: Stripe payment link is missing. Please try again later.</p>
+                    `;
                         }
                     } catch (e) {
-                        // Handle non-JSON responses like "Queue is full."
                         console.error('Error parsing JSON:', e, 'Raw response:', text);
 
                         if (text.includes('Queue is full')) {
                             document.getElementById('result').innerHTML = `
-                                <p>Error: The server is busy. Please try again later.</p>
-                            `;
+                        <p>Error: The server is busy. Please try again later.</p>
+                    `;
                         } else {
                             document.getElementById('result').innerHTML = `
-                                <p>Unexpected server response: ${text}</p>
-                            `;
+                        <p>Unexpected server response: ${text}</p>
+                    `;
                         }
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching or processing data:', error);
                     document.getElementById('result').innerHTML = `
-                        <p>Error calculating emissions. Please try again later.</p>
-                        <pre>${error.message}</pre>
-                    `;
+                <p>Error calculating emissions. Please try again later.</p>
+                <pre>${error.message}</pre>
+            `;
                 });
         };
     </script>
