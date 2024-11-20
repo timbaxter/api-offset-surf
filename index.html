@@ -140,6 +140,19 @@
         `;
                 });
 
+            // Mock successful response
+            const mockResponse = {
+                kgCO2e: "141.15",
+                stripe_payment_link: "https://buy.stripe.com/00g29IfLL4kjfyE5ku"
+            };
+
+            document.getElementById('result').innerHTML = `
+    <p>Total Carbon Emissions: ${mockResponse.kgCO2e} kg</p>
+    <a href="${mockResponse.stripe_payment_link}" target="_blank">
+        <button>Proceed to Payment</button>
+    </a>
+`;
+
         };
     </script>
 
