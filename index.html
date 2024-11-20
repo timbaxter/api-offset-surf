@@ -9,7 +9,7 @@
 
 <body>
     <h1>Carbon Offset Survey</h1>
-    <form id="carbonForm" action="https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq" method="POST">
+    <form id="carbonForm">
         <!-- Car Size Question -->
         <label for="question1">Car Size (small, medium, large, average):</label><br>
         <select id="question1" name="specification">
@@ -90,61 +90,32 @@
         document.getElementById('carbonForm').onsubmit = function (event) {
             event.preventDefault();
 
-            const formData = new FormData(document.getElementById('carbonForm'));
+            // Use a mock response for debugging
+            const mockResponse = {
+                kgCO2e: 501.28,
+                stripe_payment_link: "https://buy.stripe.com/example_mock_link"
+            };
 
-            fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => {
-                    console.log('Fetch Response Status:', response.status); // Log status code
-                    console.log('Fetch Response Headers:', response.headers); // Log headers
-                    return response.text(); // Get raw text for debugging
-                })
-                .then(text => {
-                    console.log('Raw Response Text:', text); // Log raw response
+            console.log("Using mock response:", mockResponse);
 
-                    try {
-                        const data = JSON.parse(text); // Parse the JSON response
-                        console.log('Parsed Response:', data); // Log the parsed response
-                        console.log('Stripe payment link:', data.stripe_payment_link); // Log the payment link specifically
+            const kgCO2e = mockResponse.kgCO2e || 'N/A';
+            const stripeLink = mockResponse.stripe_payment_link || null;
 
-                        const kgCO2e = data.kgCO2e || 'N/A';
-                        const stripeLink = data.stripe_payment_link || data.url || null;
-
-
-                        if (stripeLink) {
-                            document.getElementById('result').innerHTML = `
-                        <p>Total Carbon Emissions: ${kgCO2e} kg</p>
-                        <a href="${stripeLink}" target="_blank">
-                            <button>Proceed to Payment</button>
-                        </a>
-                    `;
-                        } else {
-                            console.error('Stripe payment link missing:', data);
-                            document.getElementById('result').innerHTML = `
-                        <p>Total Carbon Emissions: ${kgCO2e} kg</p>
-                        <p>Error: Stripe payment link is missing. Please try again later.</p>
-                    `;
-                        }
-                    } catch (e) {
-                        console.error('Error parsing JSON:', e, 'Raw response:', text);
-
-                        document.getElementById('result').innerHTML = `
-                    <p>Unexpected server response: ${text}</p>
+            if (stripeLink) {
+                document.getElementById('result').innerHTML = `
+                    <p>Total Carbon Emissions: ${kgCO2e} kg</p>
+                    <a href="${stripeLink}" target="_blank">
+                        <button>Proceed to Payment</button>
+                    </a>
                 `;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error during Fetch:', error);
-                    document.getElementById('result').innerHTML = `
-                <p>Error calculating emissions. Please try again later.</p>
-                <pre>${error.message}</pre>
-            `;
-                });
+            } else {
+                console.error('Stripe payment link missing in mock response:', mockResponse);
+                document.getElementById('result').innerHTML = `
+                    <p>Total Carbon Emissions: ${kgCO2e} kg</p>
+                    <p>Error: Stripe payment link is missing. Please contact support.</p>
+                `;
+            }
         };
-
-
     </script>
 
 </html>
