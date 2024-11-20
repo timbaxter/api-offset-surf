@@ -97,16 +97,16 @@
                 body: formData
             })
                 .then(response => {
-                    console.log('Fetch Response Status:', response.status); // Log status code
-                    console.log('Fetch Response Headers:', response.headers); // Log headers
+                    console.log('Fetch Response Status:', response.status);
+                    console.log('Fetch Response Headers:', response.headers);
                     return response.text(); // Get raw text for debugging
                 })
                 .then(text => {
-                    console.log('Raw Response Text:', text); // Log raw response
+                    console.log('Raw Response Text:', text);
 
                     try {
                         const data = JSON.parse(text); // Parse the JSON response
-                        console.log('Parsed Response:', data); // Log the parsed response
+                        console.log('Parsed Response:', data);
                         console.log('Stripe payment link:', data.stripe_payment_link); // Log the payment link specifically
 
                         const kgCO2e = data.kgCO2e || 'N/A';
