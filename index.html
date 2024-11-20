@@ -108,7 +108,7 @@
                         console.log('Parsed Response JSON:', data);
 
                         const kgCO2e = data.kgCO2e || 'N/A';
-                        const stripeLink = data.stripe_payment_link || null;
+                        const stripeLink = data.Stripe_payment_link || null;
 
                         if (stripeLink) {
                             document.getElementById('result').innerHTML = `
