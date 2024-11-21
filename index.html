@@ -88,7 +88,7 @@
 
         // Form submission handler
         document.getElementById('carbonForm').onsubmit = function (event) {
-            event.preventDefault(); // Prevent the form from submitting
+            event.preventDefault();
 
             const formData = new FormData(document.getElementById('carbonForm'));
 
@@ -97,21 +97,23 @@
                 body: formData
             })
                 .then(response => {
-                    console.log('Fetch Response Status:', response.status); // Log HTTP status
-                    console.log('Fetch Response Headers:', response.headers); // Log headers
+                    console.log('Fetch Response Status:', response.status);
                     return response.text();
                 })
                 .then(text => {
-                    console.log('Raw Response Text:', text); // Log raw text response
+                    console.log('Raw Response Text:', text);
 
                     try {
                         const data = JSON.parse(text);
-                        console.log('Parsed Response:', data); // Log parsed JSON
+                        console.log('Parsed Response:', data);
+
+                        // Log all keys in the response object
+                        console.log('Keys in Parsed Response:', Object.keys(data));
 
                         const kgCO2e = data.kgCO2e || 'N/A';
                         const stripeLink = data.stripe_payment_link || null;
 
-                        console.log('Stripe Payment Link:', stripeLink); // Log the payment link
+                        console.log('Stripe payment link:', stripeLink);
 
                         if (stripeLink) {
                             document.getElementById('result').innerHTML = `
@@ -121,7 +123,7 @@
                         </a>
                     `;
                         } else {
-                            console.error('Stripe payment link missing in response:', data);
+                            console.error('Stripe payment link is missing in the response:', data);
                             document.getElementById('result').innerHTML = `
                         <p>Total Carbon Emissions: ${kgCO2e} kg</p>
                         <p>Error: Stripe payment link is missing. Please try again later.</p>
@@ -129,20 +131,20 @@
                         }
                     } catch (e) {
                         console.error('Error parsing JSON:', e, 'Raw response:', text);
+
                         document.getElementById('result').innerHTML = `
                     <p>Unexpected server response: ${text}</p>
                 `;
                     }
                 })
                 .catch(error => {
-                    console.error('Fetch error:', error);
+                    console.error('Error during Fetch:', error);
                     document.getElementById('result').innerHTML = `
                 <p>Error calculating emissions. Please try again later.</p>
                 <pre>${error.message}</pre>
-            `;
+                    `;
                 });
         };
-
     </script>
 
 </html>
