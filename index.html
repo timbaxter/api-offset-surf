@@ -92,52 +92,47 @@
 
             const formData = new FormData(document.getElementById('carbonForm'));
 
-            // Send data to Webhook.site for logging
-            fetch('https://webhook.site/3c0c3113-c24d-497d-9862-1419a6a70dac', {
+            // Send data to Make.com Webhook
+            fetch('https://hook.eu2.make.com/kwrobdamrwxbp6o2i1a1rckwem1xtovq', {
                 method: 'POST',
                 body: formData
             })
                 .then(response => {
                     console.log('Fetch Response Status:', response.status);
-                    return response.text(); // Webhook.site doesn't return a real response
+                    if (!response.ok) {
+                        throw new Error(`Server responded with status ${response.status}`);
+                    }
+                    return response.json(); // Ensure JSON parsing
                 })
-                .then(() => {
-                    // Simulate a backend response using mock data
-                    const mockResponse = {
-                        kgCO2e: "123.45",
-                        stripe_payment_link: "https://buy.stripe.com/example_mock_link"
-                    };
+                .then(data => {
+                    console.log('Parsed Response:', data);
 
-                    console.log("Using Mock Response:", mockResponse);
-
-                    const kgCO2e = mockResponse.kgCO2e || 'N/A';
-                    const stripeLink = mockResponse.stripe_payment_link || null;
+                    const kgCO2e = data.kgCO2e || 'N/A';
+                    const stripeLink = data.stripe_payment_link || null;
 
                     if (stripeLink) {
                         document.getElementById('result').innerHTML = `
-                    <p>Total Carbon Emissions: ${kgCO2e} kg</p>
-                    <a href="${stripeLink}" target="_blank">
-                        <button>Proceed to Payment</button>
-                    </a>
-                `;
+                            <p>Total Carbon Emissions: ${kgCO2e} kg</p>
+                            <a href="${stripeLink}" target="_blank">
+                                <button>Proceed to Payment</button>
+                            </a>
+                        `;
                     } else {
-                        console.error('Stripe payment link missing in mock response:', mockResponse);
+                        console.error('Stripe payment link is missing in the response:', data);
                         document.getElementById('result').innerHTML = `
-                    <p>Total Carbon Emissions: ${kgCO2e} kg</p>
-                    <p>Error: Stripe payment link is missing. Please contact support.</p>
-                `;
+                            <p>Total Carbon Emissions: ${kgCO2e} kg</p>
+                            <p>Error: Stripe payment link is missing. Please contact support.</p>
+                        `;
                     }
                 })
                 .catch(error => {
                     console.error('Error during Fetch:', error);
                     document.getElementById('result').innerHTML = `
-                <p>Error calculating emissions. Please try again later.</p>
-                <pre>${error.message}</pre>
-            `;
+                        <p>Error calculating emissions. Please try again later.</p>
+                        <pre>${error.message}</pre>
+                    `;
                 });
         };
-
-
     </script>
 
 </html>
