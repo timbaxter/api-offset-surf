@@ -92,7 +92,7 @@
 
             const formData = new FormData(document.getElementById('carbonForm'));
 
-            // Send data to Webhook.site
+            // Send data to Webhook.site for logging
             fetch('https://webhook.site/3c0c3113-c24d-497d-9862-1419a6a70dac', {
                 method: 'POST',
                 body: formData
@@ -101,12 +101,10 @@
                     console.log('Fetch Response Status:', response.status);
                     return response.text(); // Webhook.site doesn't return a real response
                 })
-                .then(text => {
-                    console.log('Raw Response Text:', text);
-
-                    // Simulate a backend response with mock data
+                .then(() => {
+                    // Simulate a backend response using mock data
                     const mockResponse = {
-                        kgCO2e: "99.01",
+                        kgCO2e: "123.45",
                         stripe_payment_link: "https://buy.stripe.com/example_mock_link"
                     };
 
@@ -138,6 +136,7 @@
             `;
                 });
         };
+
 
     </script>
 
