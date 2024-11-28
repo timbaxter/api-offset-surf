@@ -110,7 +110,7 @@
                     const kgCO2e = data.kgCO2e || 'N/A';
                     const stripeLink = data.stripe_payment_link || null;
 
-                    if (kgCO2e !== 'N/A' && stripeLink) {
+                    if (stripeLink) {
                         document.getElementById('result').innerHTML = `
                             <p>Total Carbon Emissions: ${kgCO2e} kg</p>
                             <a href="${stripeLink}" target="_blank">
@@ -118,9 +118,10 @@
                             </a>
                         `;
                     } else {
-                        console.error('Data missing in the response:', data);
+                        console.error('Stripe payment link is missing in the response:', data);
                         document.getElementById('result').innerHTML = `
-                            <p>Error: Missing data. Please try again later.</p>
+                            <p>Total Carbon Emissions: ${kgCO2e} kg</p>
+                            <p>Error: Stripe payment link is missing. Please contact support.</p>
                         `;
                     }
                 })
